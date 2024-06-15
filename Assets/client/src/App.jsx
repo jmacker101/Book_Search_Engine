@@ -1,45 +1,40 @@
-import './App.css';
 import { Outlet } from 'react-router-dom';
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  createHttpLink,
-} from '@apollo/client';
-import { setContext } from '@apollo/client/link/context';
-import Navbar from './components/Navbar';
+// Importing the 'App.css' file for styling
+import './App.css';
+
+// Import necessary components and functions from Apollo Client and other libraries
+import { ApolloClient, InMemoryCache, ApolloLink, ApolloProvider } from '@apollo/client';
+import { RestLink } from 'apollo-link-rest';
+import AppNavbar from './components/AppNavbar';
 
 
-const httpLink = createHttpLink({
-  uri: '/graphql',
+// Set `RestLink` with your endpoint
+const restLink = new RestLink({ uri: "https://swapi.dev/api/" });
+
+// Creating an authentication link to set the authorization header with a token
+const link = new ApolloLink((operation, forward) => {
+  // This is where you can do something with the request, like adding headers
+  return forward(operation);
 });
 
-const authLink = setContext((_, { headers }) => {
-  
-  const token = localStorage.getItem('id_token');
-  return {
-    headers: {
-      ...headers,
-      authorization: token ? `Bearer ${token}` : '',
-    },
-  };
-});
+// Use restLink in your ApolloClient setup
 const client = new ApolloClient({
-  
-  link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
+  link: ApolloLink.from([restLink, link]), // Assuming 'link' is your existing ApolloLink instance
 });
 
+// Main App component
 function App() {
   return (
-    <>
-      <ApolloClient client={client}>
-      <Navbar />
+    // Wrapping the entire application with ApolloProvider to enable Apollo Client functionality
+    <ApolloProvider client={client}>
+      {/* Including the 'AppNavbar' component instead of 'Navbar' */}
+      <AppNavbar />
+      {/* Rendering the content based on the current route using 'Outlet' from React Router */}
       <Outlet />
-      </ApolloClient>
-    
-    </>
+    </ApolloProvider>
   );
 }
 
+// Exporting the 'App' component as the default export
 export default App;
