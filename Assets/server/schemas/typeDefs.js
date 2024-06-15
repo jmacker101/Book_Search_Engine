@@ -1,40 +1,47 @@
 const typeDefs = `
-  type Book {
-    bookId: ID!
-    title: String
-    authors: String
-    description: String
-    image: String
-    link: String
-  }
-  type User {
-    _id: ID!
-    username: String!
-    email: String
-    bookCount: Int
-    savedBooks: [Book]
-  }
-  type Auth {
-    token: ID!
-    user: User
-  }
-  input BookInput {
-    authors: [String]
-    description: String!
-    bookId: String!
-    image: String
-    link: String
-    title: String!
-  }
-  type Query {
-   me: User
-  }
-  type Mutation {
-    logIn(email: String!, password: String!):Auth
-    addUser(username: String!, email: String!, password: String!):Auth
-    saveBook(bookData: BookInput!): User
-    removeBook(bookId: ID!):User
-  }
+    type Book {
+        _id: ID!
+        authors: [String]
+        description: String!
+        bookId: String!
+        image: String
+        link: String
+        title: String!
+    }
+
+    type User {
+        _id: ID!
+        username: String!
+        email: String!
+        password: String!
+        savedBooks: [Book]
+    }
+
+    type Auth {
+        token: String!
+        user: User
+    }
+
+    input BookArrayInput {
+        authors: [String]
+        description: String!
+        bookId: String!
+        image: String
+        link: String
+        title: String!
+    }
+
+    type Query {
+        me(_id: String, username: String): User
+    }
+
+    type Mutation {
+        createUser(username: String!, email: String!, password: String!): Auth
+        login(email: String!, password: String!): Auth
+        saveBook(content: BookArrayInput!): User
+        deleteBook(bookId: String!): User
+    }
 `;
 
+// Export the GraphQL schema definition
 module.exports = typeDefs;
